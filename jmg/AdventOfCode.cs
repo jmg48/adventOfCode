@@ -27,13 +27,21 @@
         [Test]
         public void DayOne()
         {
-            Console.WriteLine(File.ReadAllLines("C:\\git\\input.txt")
+            Console.WriteLine(File.ReadLines("C:\\git\\input.txt")
                 .Aggregate(
                     (0, 0),
                     (a, s) => string.IsNullOrWhiteSpace(s)
                         ? (Math.Max(a.Item1, a.Item2), 0)
                         : (a.Item1, a.Item2 + int.Parse(s)),
                     a => a.Item1));
+
+            var top3 = File.ReadLines("C:\\git\\input.txt")
+                .Aggregate(
+                    (new List<int> { 0, 0, 0 }, 0),
+                    (a, s) => string.IsNullOrWhiteSpace(s)
+                        ? (a.Item1.Concat(new[] { a.Item2 }).OrderByDescending(i => i).Take(3).ToList(), 0)
+                        : (a.Item1, a.Item2 + int.Parse(s)),
+                    a => a.Item1);
 
             var totals = new List<int>();
 
@@ -220,7 +228,7 @@
         }
 
         [Test]
-        public void DayFour()
+        public void DayFour_1()
         {
             var contains = 0;
             var overlaps = 0;
@@ -245,6 +253,83 @@
 
             Console.WriteLine(contains);
             Console.WriteLine(overlaps);
+        }
+
+        [TestCase(1)]
+        [TestCase(2)]
+        public void DayFive(int part)
+        {
+            using var reader = new StreamReader("C:\\git\\input5.txt");
+            var stackLines = new List<string>();
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    break;
+                }
+
+                stackLines.Add(line);
+            }
+
+            var stacks = new Dictionary<int, Stack<char>>();
+            foreach (var i in stackLines.Last().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(int.Parse))
+            {
+                stacks.Add(i, new Stack<char>());
+            }
+
+            foreach (var stackLine in stackLines.AsEnumerable().Reverse().Skip(1))
+            {
+                foreach (var stack in stacks.Keys)
+                {
+                    var val = stackLine[(stack * 4) - 3];
+                    if (val != ' ')
+                    {
+                        stacks[stack].Push(val);
+                    }
+                }
+            }
+
+            while (!reader.EndOfStream)
+            {
+                var line = Regex.Match(reader.ReadLine(), @"move (\d+) from (\d+) to (\d+)");
+                var n = int.Parse(line.Groups[1].Value);
+                var from = int.Parse(line.Groups[2].Value);
+                var to = int.Parse(line.Groups[3].Value);
+
+                switch (part)
+                {
+                    case 1:
+                        for (var i = 0; i < n; i++)
+                        {
+                            stacks[to].Push(stacks[from].Pop());
+                        }
+
+                        break;
+                    case 2:
+                        var crane = new Stack<char>();
+                        for (var i = 0; i < n; i++)
+                        {
+                            crane.Push(stacks[from].Pop());
+                        }
+
+                        for (var i = 0; i < n; i++)
+                        {
+                            stacks[to].Push(crane.Pop());
+                        }
+
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+
+            foreach (var kvp in stacks.OrderBy(stack => stack.Key))
+            {
+                Console.Write(kvp.Value.Peek());
+            }
+
+            Console.WriteLine();
         }
     }
 }
