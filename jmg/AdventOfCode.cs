@@ -332,18 +332,13 @@
             Console.WriteLine();
         }
 
-        [Test]
-        public void Day6()
+        [TestCase(4)]
+        [TestCase(14)]
+        public void Day6(int n)
         {
             var input = File.ReadAllText("C:\\git\\input6.txt");
-            for (var i = 4; i < input.Length; i++)
-            {
-                if (new HashSet<char>(input.Skip(i - 14).Take(14)).Count == 14)
-                {
-                    Console.WriteLine(i);
-                    return;
-                }
-            }
+            Console.WriteLine(Enumerable.Range(n, input.Length - n)
+                .First(i => new HashSet<char>(input.Skip(i - n).Take(n)).Count == n));
         }
     }
 }
