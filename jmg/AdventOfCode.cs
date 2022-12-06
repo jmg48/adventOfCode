@@ -331,5 +331,19 @@
 
             Console.WriteLine();
         }
+
+        [Test]
+        public void Day6()
+        {
+            var input = File.ReadAllText("C:\\git\\input6.txt");
+            for (var i = 4; i < input.Length; i++)
+            {
+                if (new HashSet<char>(input.Skip(i - 14).Take(14)).Count == 14)
+                {
+                    Console.WriteLine(i);
+                    return;
+                }
+            }
+        }
     }
 }
