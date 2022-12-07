@@ -1,10 +1,12 @@
 ﻿namespace AdventOfCode
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using FluentAssertions;
     using NUnit.Framework;
 
     [TestFixture]
@@ -344,25 +346,26 @@
         [Test]
         public void Day7()
         {
-            var input = File.ReadAllLines("C:\\git\\input7.txt");
-            var currentPath = new Stack<string>();
-            var fileSizes = new Dictionary<string, int> { { string.Empty, 0 } };
-            foreach (var line in input)
+            var fileSizes = new Dictionary<string, int>();
+
+            var paths = new Stack<string>();
+            string CurrentPath() => paths.Count == 0 ? string.Empty : paths.Peek();
+            foreach (var line in File.ReadLines("C:\\git\\input7.txt"))
             {
                 if (line.StartsWith("$ cd "))
                 {
-                    var arg = line.Substring(5);
-                    if (arg == "/")
+                    var arg = line[5..];
+                    switch (arg)
                     {
-                        currentPath.Clear();
-                    }
-                    else if (arg == "..")
-                    {
-                        currentPath.Pop();
-                    }
-                    else
-                    {
-                        currentPath.Push(arg);
+                        case "/":
+                            paths.Clear();
+                            break;
+                        case "..":
+                            paths.Pop();
+                            break;
+                        default:
+                            paths.Push($"{CurrentPath()}/{arg}");
+                            break;
                     }
                 }
                 else if (line.StartsWith("$ ls"))
@@ -370,41 +373,40 @@
                 }
                 else
                 {
-                    var d = line.Split(' ');
-                    if (d[0] == "dir")
+                    var ls = line.Split(' ');
+                    if (ls[0] != "dir")
                     {
-                    }
-                    else
-                    {
-                        fileSizes.Add(string.Join('/', currentPath.Reverse()) + $"/{d[1]}", int.Parse(d[0]));
+                        fileSizes.Add($"{CurrentPath()}/{ls[1]}", int.Parse(ls[0]));
                     }
                 }
             }
 
-            var dirSizes = new Dictionary<string, int>();
-            foreach (var (file, size) in fileSizes)
+            var dirSizes = new ConcurrentDictionary<string, int>();
+            foreach (var (file, fileSize) in fileSizes)
             {
-                var split = file.Split('/');
-                for (int i = 0; i < split.Length; i++)
+                var pathSegments = file.Split('/');
+                for (var i = 1; i < pathSegments.Length; i++)
                 {
-                    var key = string.Join('/', split.Take(i));
-                    if (!dirSizes.ContainsKey(key))
-                    {
-                        dirSizes.Add(key, 0);
-                    }
+                    var key = string.Join('/', pathSegments.Take(i));
 
-                    dirSizes[key] += size;
+                    dirSizes.AddOrUpdate(
+                        key,
+                        _ => fileSize,
+                        (_, dirSize) => dirSize + fileSize);
                 }
             }
 
-            var result = dirSizes.Values.Where(i => i <= 100000).Sum();
-            Console.WriteLine($"Part One: {result}");
+            var result1 = dirSizes.Values.Where(i => i <= 100000).Sum();
+            Console.WriteLine($"Part One: {result1}");
 
-            var totalSize = fileSizes.Sum(kvp => kvp.Value);
+            var totalSize = dirSizes[string.Empty];
             var freeSpace = 70000000 - totalSize;
             var additionalRequired = 30000000 - freeSpace;
-            var result2 = dirSizes.OrderBy(i => i.Value).First(i => i.Value >= additionalRequired);
-            Console.WriteLine($"Part Two: {result2.Value}");
+            var result2 = dirSizes.Values.OrderBy(i => i).First(i => i >= additionalRequired);
+            Console.WriteLine($"Part Two: {result2}");
+
+            result1.Should().Be(1648397);
+            result2.Should().Be(1815525);
         }
     }
 }
