@@ -346,10 +346,9 @@
         [Test]
         public void Day7()
         {
-            var fileSizes = new Dictionary<string, int>();
+            var dirSizes = new ConcurrentDictionary<string, int>();
 
-            var paths = new Stack<string>();
-            string CurrentPath() => paths.Count == 0 ? string.Empty : paths.Peek();
+            var paths = new Stack<string>(new[] { string.Empty });
             foreach (var line in File.ReadLines("C:\\git\\input7.txt"))
             {
                 if (line.StartsWith("$ cd "))
@@ -359,12 +358,13 @@
                     {
                         case "/":
                             paths.Clear();
+                            paths.Push(string.Empty);
                             break;
                         case "..":
                             paths.Pop();
                             break;
                         default:
-                            paths.Push($"{CurrentPath()}/{arg}");
+                            paths.Push($"{paths.Peek()}/{arg}");
                             break;
                     }
                 }
@@ -376,23 +376,15 @@
                     var ls = line.Split(' ');
                     if (ls[0] != "dir")
                     {
-                        fileSizes.Add($"{CurrentPath()}/{ls[1]}", int.Parse(ls[0]));
+                        var fileSize = int.Parse(ls[0]);
+                        foreach (var path in paths)
+                        {
+                            dirSizes.AddOrUpdate(
+                                path,
+                                _ => fileSize,
+                                (_, dirSize) => dirSize + fileSize);
+                        }
                     }
-                }
-            }
-
-            var dirSizes = new ConcurrentDictionary<string, int>();
-            foreach (var (file, fileSize) in fileSizes)
-            {
-                var pathSegments = file.Split('/');
-                for (var i = 1; i < pathSegments.Length; i++)
-                {
-                    var key = string.Join('/', pathSegments.Take(i));
-
-                    dirSizes.AddOrUpdate(
-                        key,
-                        _ => fileSize,
-                        (_, dirSize) => dirSize + fileSize);
                 }
             }
 
@@ -402,6 +394,7 @@
             var totalSize = dirSizes[string.Empty];
             var freeSpace = 70000000 - totalSize;
             var additionalRequired = 30000000 - freeSpace;
+
             var result2 = dirSizes.Values.OrderBy(i => i).First(i => i >= additionalRequired);
             Console.WriteLine($"Part Two: {result2}");
 
