@@ -337,8 +337,74 @@
         public void Day6(int n)
         {
             var input = File.ReadAllText("C:\\git\\input6.txt");
-            Console.WriteLine(Enumerable.Range(n, input.Length - n)
-                .First(i => new HashSet<char>(input.Skip(i - n).Take(n)).Count == n));
+            Console.WriteLine(
+                Enumerable.Range(n, input.Length - n).First(i => new HashSet<char>(input.Skip(i - n).Take(n)).Count == n));
+        }
+
+        [Test]
+        public void Day7()
+        {
+            var input = File.ReadAllLines("C:\\git\\input7.txt");
+            var currentPath = new Stack<string>();
+            var fileSizes = new Dictionary<string, int> { { string.Empty, 0 } };
+            foreach (var line in input)
+            {
+                if (line.StartsWith("$ cd "))
+                {
+                    var arg = line.Substring(5);
+                    if (arg == "/")
+                    {
+                        currentPath.Clear();
+                    }
+                    else if (arg == "..")
+                    {
+                        currentPath.Pop();
+                    }
+                    else
+                    {
+                        currentPath.Push(arg);
+                    }
+                }
+                else if (line.StartsWith("$ ls"))
+                {
+                }
+                else
+                {
+                    var d = line.Split(' ');
+                    if (d[0] == "dir")
+                    {
+                    }
+                    else
+                    {
+                        fileSizes.Add(string.Join('/', currentPath.Reverse()) + $"/{d[1]}", int.Parse(d[0]));
+                    }
+                }
+            }
+
+            var dirSizes = new Dictionary<string, int>();
+            foreach (var (file, size) in fileSizes)
+            {
+                var split = file.Split('/');
+                for (int i = 0; i < split.Length; i++)
+                {
+                    var key = string.Join('/', split.Take(i));
+                    if (!dirSizes.ContainsKey(key))
+                    {
+                        dirSizes.Add(key, 0);
+                    }
+
+                    dirSizes[key] += size;
+                }
+            }
+
+            var result = dirSizes.Values.Where(i => i <= 100000).Sum();
+            Console.WriteLine($"Part One: {result}");
+
+            var totalSize = fileSizes.Sum(kvp => kvp.Value);
+            var freeSpace = 70000000 - totalSize;
+            var additionalRequired = 30000000 - freeSpace;
+            var result2 = dirSizes.OrderBy(i => i.Value).First(i => i.Value >= additionalRequired);
+            Console.WriteLine($"Part Two: {result2.Value}");
         }
     }
 }
