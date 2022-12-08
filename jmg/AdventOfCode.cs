@@ -422,42 +422,47 @@
                         visibleTrees++;
                     }
 
-                    int scoreLeft;
-                    for (scoreLeft = 1; i - scoreLeft >= 0 && grid[i - scoreLeft][j] < height; scoreLeft++)
+                    var scoreUp = i;
+                    for (var k = 1; i - k >= 0; k++)
                     {
+                        if (grid[i - k][j] >= height)
+                        {
+                            scoreUp = k;
+                            break;
+                        }
                     }
 
-                    scoreLeft--;
-
-                    int scoreUp;
-                    for (scoreUp = 1; j - scoreUp >= 0 && grid[i][j - scoreUp] < height; scoreUp++)
+                    var scoreLeft = j;
+                    for (var k = 1; j - k >= 0; k++)
                     {
+                        if (grid[i][j - k] >= height)
+                        {
+                            scoreLeft = k;
+                            break;
+                        }
                     }
 
-                    scoreUp--;
-
-                    int scoreRight;
-                    for (scoreRight = 1; i + scoreRight < grid.Count && grid[i + scoreRight][j] < height; scoreRight++)
+                    var scoreDown = grid.Count - i - 1;
+                    for (var k = 1; i + k < grid.Count; k++)
                     {
+                        if (grid[i + k][j] >= height)
+                        {
+                            scoreDown = k;
+                            break;
+                        }
                     }
 
-                    scoreRight--;
-
-                    int scoreDown;
-                    for (scoreDown = 1; j + scoreDown < grid[0].Count && grid[i][j + scoreDown] < height; scoreDown++)
+                    var scoreRight = grid[0].Count - j - 1;
+                    for (var k = 1; j + k < grid[0].Count; k++)
                     {
+                        if (grid[i][j + k] >= height)
+                        {
+                            scoreRight = k;
+                            break;
+                        }
                     }
 
-                    scoreDown--;
-
-                    var score = scoreLeft * scoreRight * scoreUp * scoreDown;
-                    if (score == 326536)
-                    {
-                        // Oops so my calculation is wrong where you stop at a tree because the taller tree counts
-                        // So it turns out this is the right tree but I got the score wrong
-                        // Calculated this tree's score by hand and it was the right answer :)
-                    }
-
+                    var score = scoreUp * scoreDown * scoreLeft * scoreRight;
                     if (score > bestScore)
                     {
                         bestScore = score;
@@ -467,8 +472,6 @@
 
             Console.WriteLine(visibleTrees);
             Console.WriteLine(bestScore);
-
-            // 326536
         }
     }
 }
