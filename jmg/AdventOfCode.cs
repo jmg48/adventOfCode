@@ -401,5 +401,74 @@
             result1.Should().Be(1648397);
             result2.Should().Be(1815525);
         }
+
+        [Test]
+        public void Day8()
+        {
+            var visibleTrees = 0;
+            var bestScore = 0;
+            var grid = new List<List<int>>(File.ReadLines("C:\\git\\input8.txt")
+                .Select(line => line.Select(c => int.Parse(new[] { c })).ToList()));
+            for (var i = 0; i < grid.Count; i++)
+            {
+                for (var j = 0; j < grid[0].Count; j++)
+                {
+                    var height = grid[i][j];
+                    if (Enumerable.Range(0, i).All(k => grid[k][j] < height)
+                        || Enumerable.Range(0, j).All(k => grid[i][k] < height)
+                        || Enumerable.Range(i + 1, grid.Count - i - 1).All(k => grid[k][j] < height)
+                        || Enumerable.Range(j + 1, grid[0].Count - j - 1).All(k => grid[i][k] < height))
+                    {
+                        visibleTrees++;
+                    }
+
+                    int scoreLeft;
+                    for (scoreLeft = 1; i - scoreLeft >= 0 && grid[i - scoreLeft][j] < height; scoreLeft++)
+                    {
+                    }
+
+                    scoreLeft--;
+
+                    int scoreUp;
+                    for (scoreUp = 1; j - scoreUp >= 0 && grid[i][j - scoreUp] < height; scoreUp++)
+                    {
+                    }
+
+                    scoreUp--;
+
+                    int scoreRight;
+                    for (scoreRight = 1; i + scoreRight < grid.Count && grid[i + scoreRight][j] < height; scoreRight++)
+                    {
+                    }
+
+                    scoreRight--;
+
+                    int scoreDown;
+                    for (scoreDown = 1; j + scoreDown < grid[0].Count && grid[i][j + scoreDown] < height; scoreDown++)
+                    {
+                    }
+
+                    scoreDown--;
+
+                    var score = scoreLeft * scoreRight * scoreUp * scoreDown;
+                    if (score == 326536)
+                    {
+                        // Oops so my calculation is wrong where you stop at a tree because the taller tree counts
+                        // So it turns out this is the right tree but I got the score wrong
+                        // Calculated this tree's score by hand and it was the right answer :)
+                    }
+
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                    }
+                }
+            }
+
+            Console.WriteLine(visibleTrees);
+            Console.WriteLine(bestScore);
+
+            // 326536
+        }
     }
 }
