@@ -474,49 +474,18 @@
         [Test]
         public void Day9()
         {
-            void NewFunction(Coord coord, Coord tail1)
-            {
-                var horiz = coord.X - tail1.X;
-                var vert = coord.Y - tail1.Y;
-
-                if (vert == 0)
-                {
-                    tail1 = horiz switch
-                    {
-                        > 1 => tail1 with { X = tail1.X + 1 },
-                        < -1 => tail1 with { X = tail1.X - 1 },
-                        _ => tail1,
-                    };
-                }
-                else if (horiz == 0)
-                {
-                    tail1 = vert switch
-                    {
-                        > 1 => tail1 with { Y = tail1.Y + 1 },
-                        < -1 => tail1 with { Y = tail1.Y - 1 },
-                        _ => tail1,
-                    };
-                }
-                else if (vert > 1 || vert < -1 || horiz > 1 || horiz < -1)
-                {
-                    tail1 = tail1 with { X = tail1.X + (horiz > 0 ? 1 : -1), Y = tail1.Y + (vert > 0 ? 1 : -1) };
-                }
-            }
-
             var coords = Enumerable.Range(0, 10).Select(_ => new Coord(0, 0)).ToList();
             var path = new List<List<Coord>>();
 
-            var head = new Coord(0, 0);
-            var tail = new Coord(0, 0);
-            var headPath = new List<Coord> { head };
-            var tailPath = new List<Coord> { tail };
             foreach (var line in File.ReadLines("C:\\git\\input9.txt").Select(line => line.Split(' ')))
             {
                 var direction = line[0];
                 var length = int.Parse(line[1]);
                 for (var i = 0; i < length; i++)
                 {
-                    head = direction switch
+                    var head = coords[0];
+
+                    coords[0] = direction switch
                     {
                         "L" => head with { X = head.X - 1 },
                         "R" => head with { X = head.X + 1 },
@@ -524,13 +493,50 @@
                         "D" => head with { Y = head.Y - 1 },
                     };
 
-                    headPath.Add(head);
+                    for (var j = 1; j < coords.Count; j++)
+                    {
+                        coords[j] = this.Follow(coords[j - 1], coords[j]);
+                    }
 
-                    NewFunction(head, tail);
+                    path.Add(coords.ToList());
                 }
             }
 
-            Console.WriteLine(tailPath.Distinct().Count());
+            Console.WriteLine(path.Select(rope => rope[1]).Distinct().Count());
+            Console.WriteLine(path.Select(rope => rope[9]).Distinct().Count());
+        }
+
+        private Coord Follow(Coord head, Coord tail)
+        {
+            var horiz = head.X - tail.X;
+            var vert = head.Y - tail.Y;
+
+            if (vert == 0)
+            {
+                return horiz switch
+                {
+                    > 1 => tail with { X = tail.X + 1 },
+                    < -1 => tail with { X = tail.X - 1 },
+                    _ => tail,
+                };
+            }
+
+            if (horiz == 0)
+            {
+                return vert switch
+                {
+                    > 1 => tail with { Y = tail.Y + 1 },
+                    < -1 => tail with { Y = tail.Y - 1 },
+                    _ => tail,
+                };
+            }
+
+            if (vert > 1 || vert < -1 || horiz > 1 || horiz < -1)
+            {
+                return tail with { X = tail.X + (horiz > 0 ? 1 : -1), Y = tail.Y + (vert > 0 ? 1 : -1) };
+            }
+
+            return tail;
         }
 
         private record Coord(int X, int Y);
