@@ -506,6 +506,56 @@
             Console.WriteLine(path.Select(rope => rope[9]).Distinct().Count());
         }
 
+        [Test]
+        public void Day10()
+        {
+            var cycle = 1;
+            var x = 1;
+            var s = new List<int> { 0, 1 };
+            foreach (var line in File.ReadLines("C:\\git\\input10.txt"))
+            {
+                switch (line[..4])
+                {
+                    case "noop":
+                        cycle++;
+                        s.Add(x);
+                        break;
+                    case "addx":
+                        cycle++;
+                        s.Add(x);
+                        cycle++;
+                        x += int.Parse(line[5..]);
+                        s.Add(x);
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+
+            int F(int i) => s[i] * i;
+
+            Console.WriteLine(F(20) + F(60) + F(100) + F(140) + F(180) + F(220));
+
+            for (var i = 1; i <= 240; i++)
+            {
+                var xPos = (i - 1) % 40;
+                if (xPos == 0)
+                {
+                    Console.WriteLine();
+                }
+
+                var spritePos = s[i];
+                if (xPos == spritePos - 1 || xPos == spritePos || xPos == spritePos + 1)
+                {
+                    Console.Write("#");
+                }
+                else
+                {
+                    Console.Write(".");
+                }
+            }
+        }
+
         private Coord Follow(Coord head, Coord tail)
         {
             var horiz = head.X - tail.X;
@@ -531,9 +581,9 @@
                 };
             }
 
-            if (vert > 1 || vert < -1 || horiz > 1 || horiz < -1)
+            if (vert is > 1 or < -1 || horiz is > 1 or < -1)
             {
-                return tail with { X = tail.X + (horiz > 0 ? 1 : -1), Y = tail.Y + (vert > 0 ? 1 : -1) };
+                return new Coord(X: tail.X + (horiz > 0 ? 1 : -1), Y: tail.Y + (vert > 0 ? 1 : -1));
             }
 
             return tail;
