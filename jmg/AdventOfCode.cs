@@ -6,6 +6,8 @@
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using Dijkstra.NET.Graph.Simple;
+    using Dijkstra.NET.ShortestPath;
     using FluentAssertions;
     using NUnit.Framework;
 
@@ -562,14 +564,14 @@
         {
             var monkeys = new List<Monkey>
             {
-                new Monkey(new List<long> { 54, 89, 94 }, old => old * 7, n => n % 17 == 0 ? 5 : 3),
-                new Monkey(new List<long> { 66, 71 }, old => old + 4, n => n % 3 == 0 ? 0 : 3),
-                new Monkey(new List<long> { 76, 55, 80, 55, 55, 96, 78 }, old => old + 2, n => n % 5 == 0 ? 7 : 4),
-                new Monkey(new List<long> { 93, 69, 76, 66, 89, 54, 59, 94 }, old => old + 7, n => n % 7 == 0 ? 5 : 2),
-                new Monkey(new List<long> { 80, 54, 58, 75, 99 }, old => old * 17, n => n % 11 == 0 ? 1 : 6),
-                new Monkey(new List<long> { 69, 70, 85, 83 }, old => old + 8, n => n % 19 == 0 ? 2 : 7),
-                new Monkey(new List<long> { 89 }, old => old + 6, n => n % 2 == 0 ? 0 : 1),
-                new Monkey(new List<long> { 62, 80, 58, 57, 93, 56 }, old => old * old, n => n % 13 == 0 ? 6 : 4),
+                new(new List<long> { 54, 89, 94 }, old => old * 7, n => n % 17 == 0 ? 5 : 3),
+                new(new List<long> { 66, 71 }, old => old + 4, n => n % 3 == 0 ? 0 : 3),
+                new(new List<long> { 76, 55, 80, 55, 55, 96, 78 }, old => old + 2, n => n % 5 == 0 ? 7 : 4),
+                new(new List<long> { 93, 69, 76, 66, 89, 54, 59, 94 }, old => old + 7, n => n % 7 == 0 ? 5 : 2),
+                new(new List<long> { 80, 54, 58, 75, 99 }, old => old * 17, n => n % 11 == 0 ? 1 : 6),
+                new(new List<long> { 69, 70, 85, 83 }, old => old + 8, n => n % 19 == 0 ? 2 : 7),
+                new(new List<long> { 89 }, old => old + 6, n => n % 2 == 0 ? 0 : 1),
+                new(new List<long> { 62, 80, 58, 57, 93, 56 }, old => old * old, n => n % 13 == 0 ? 6 : 4),
             };
 
             var rounds = part == 1 ? 20 : 10000;
@@ -583,16 +585,97 @@
                     {
                         monkey.Inspections++;
                         var item = monkey.Items.Dequeue();
-                        item = monkey.Operation(item);
-                        item = reduce(item);
-                        var throwTo = monkey.ThrowTo(item);
-                        monkeys[throwTo].Items.Enqueue(item);
+                        item = reduce(monkey.Operation(item));
+                        monkeys[monkey.ThrowTo(item)].Items.Enqueue(item);
                     }
                 }
             }
 
             var result = monkeys.Select(monkey => monkey.Inspections).OrderByDescending(i => i).Take(2).Aggregate((a, b) => a * b);
             Console.WriteLine(result);
+        }
+
+        [Test]
+        public void Day12()
+        {
+            var graph = new Graph();
+            var input = File.ReadLines("C:\\git\\input12.txt").Select(line => line.Select(c => (c, graph.AddNode())).ToList()).ToList();
+
+            int Height((char c, uint) cell) => cell.c switch
+            {
+                'S' => (int)'a',
+                'E' => (int)'z',
+                _ => (int)cell.c,
+            };
+
+            uint start = 0;
+            uint end = 0;
+            var starts = new List<uint>();
+            for (var i = 0; i < input.Count; i++)
+            {
+                for (var j = 0; j < input[0].Count; j++)
+                {
+                    var cell = input[i][j];
+
+                    switch (cell.c)
+                    {
+                        case 'S':
+                            start = cell.Item2;
+                            starts.Add(cell.Item2);
+                            break;
+                        case 'E':
+                            end = cell.Item2;
+                            break;
+                        case 'a':
+                            starts.Add(cell.Item2);
+                            break;
+                    }
+
+                    if (i > 0)
+                    {
+                        var up = input[i - 1][j];
+                        if (Height(up) - Height(cell) <= 1)
+                        {
+                            graph.Connect(cell.Item2, up.Item2, 1);
+                        }
+                    }
+
+                    if (j > 0)
+                    {
+                        var left = input[i][j - 1];
+                        if (Height(left) - Height(cell) <= 1)
+                        {
+                            graph.Connect(cell.Item2, left.Item2, 1);
+                        }
+                    }
+
+                    if (i + 1 < input.Count)
+                    {
+                        var down = input[i + 1][j];
+                        if (Height(down) - Height(cell) <= 1)
+                        {
+                            graph.Connect(cell.Item2, down.Item2, 1);
+                        }
+                    }
+
+                    if (j + 1 < input[0].Count)
+                    {
+                        var right = input[i][j + 1];
+                        if (Height(right) - Height(cell) <= 1)
+                        {
+                            graph.Connect(cell.Item2, right.Item2, 1);
+                        }
+                    }
+                }
+            }
+
+            var result = graph.Dijkstra(start, end);
+
+            Console.WriteLine(result.Distance);
+
+            var result2 = starts.Select(n => graph.Dijkstra(n, end)).MinBy(path => path.Distance);
+
+            Console.WriteLine(result2.Distance);
         }
 
         private Coord Follow(Coord head, Coord tail)
