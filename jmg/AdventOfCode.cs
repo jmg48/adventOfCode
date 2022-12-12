@@ -673,9 +673,31 @@
 
             Console.WriteLine(result.Distance);
 
+            var path = new HashSet<uint>(result.GetPath());
+            for (var i = 0; i < input.Count; i++)
+            {
+                for (var j = 0; j < input[0].Count; j++)
+                {
+                    Console.Write(path.Contains(input[i][j].Item2) ? "X" : " ");
+                }
+
+                Console.WriteLine();
+            }
+
             var result2 = starts.Select(n => graph.Dijkstra(n, end)).MinBy(path => path.Distance);
 
             Console.WriteLine(result2.Distance);
+
+            var path2 = new HashSet<uint>(result.GetPath());
+            for (var i = 0; i < input.Count; i++)
+            {
+                for (var j = 0; j < input[0].Count; j++)
+                {
+                    Console.Write(path2.Contains(input[i][j].Item2) ? "X" : " ");
+                }
+
+                Console.WriteLine();
+            }
         }
 
         private Coord Follow(Coord head, Coord tail)
