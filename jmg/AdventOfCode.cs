@@ -599,13 +599,13 @@
         public void Day12()
         {
             var graph = new Graph();
-            var input = File.ReadLines("C:\\git\\input12.txt").Select(line => line.Select(c => (c, graph.AddNode())).ToList()).ToList();
+            var input = File.ReadLines("C:\\git\\input12.txt").Select(line => line.Select(c => (c, graph.AddNode())).ToList<(char C, uint N)>()).ToList();
 
-            int Height((char c, uint) cell) => cell.c switch
+            int Height((char C, uint N) cell) => cell.C switch
             {
                 'S' => (int)'a',
                 'E' => (int)'z',
-                _ => (int)cell.c,
+                _ => (int)cell.C,
             };
 
             uint start = 0;
@@ -617,17 +617,17 @@
                 {
                     var cell = input[i][j];
 
-                    switch (cell.c)
+                    switch (cell.C)
                     {
                         case 'S':
-                            start = cell.Item2;
-                            starts.Add(cell.Item2);
+                            start = cell.N;
+                            starts.Add(cell.N);
                             break;
                         case 'E':
-                            end = cell.Item2;
+                            end = cell.N;
                             break;
                         case 'a':
-                            starts.Add(cell.Item2);
+                            starts.Add(cell.N);
                             break;
                     }
 
@@ -636,7 +636,7 @@
                         var up = input[i - 1][j];
                         if (Height(up) - Height(cell) <= 1)
                         {
-                            graph.Connect(cell.Item2, up.Item2, 1);
+                            graph.Connect(cell.N, up.N, 1);
                         }
                     }
 
@@ -645,7 +645,7 @@
                         var left = input[i][j - 1];
                         if (Height(left) - Height(cell) <= 1)
                         {
-                            graph.Connect(cell.Item2, left.Item2, 1);
+                            graph.Connect(cell.N, left.N, 1);
                         }
                     }
 
@@ -654,7 +654,7 @@
                         var down = input[i + 1][j];
                         if (Height(down) - Height(cell) <= 1)
                         {
-                            graph.Connect(cell.Item2, down.Item2, 1);
+                            graph.Connect(cell.N, down.N, 1);
                         }
                     }
 
@@ -663,7 +663,7 @@
                         var right = input[i][j + 1];
                         if (Height(right) - Height(cell) <= 1)
                         {
-                            graph.Connect(cell.Item2, right.Item2, 1);
+                            graph.Connect(cell.N, right.N, 1);
                         }
                     }
                 }
@@ -674,30 +674,88 @@
             Console.WriteLine(result.Distance);
 
             var path = new HashSet<uint>(result.GetPath());
-            for (var i = 0; i < input.Count; i++)
-            {
-                for (var j = 0; j < input[0].Count; j++)
-                {
-                    Console.Write(path.Contains(input[i][j].Item2) ? "X" : " ");
-                }
-
-                Console.WriteLine();
-            }
+            Console.WriteLine(string.Join(Environment.NewLine, input.Select(row => string.Concat(row.Select(cell => path.Contains(cell.N) ? "X" : " ")))));
 
             var result2 = starts.Select(n => graph.Dijkstra(n, end)).MinBy(path => path.Distance);
 
             Console.WriteLine(result2.Distance);
 
             var path2 = new HashSet<uint>(result.GetPath());
-            for (var i = 0; i < input.Count; i++)
+            Console.WriteLine(string.Join(Environment.NewLine, input.Select(row => string.Concat(row.Select(cell => path2.Contains(cell.N) ? "X" : " ")))));
+        }
+
+        [Test]
+        public void Day13()
+        {
+            Packet Parse(string input)
             {
-                for (var j = 0; j < input[0].Count; j++)
+                var result = new Packet { List = new List<Packet>() };
+                for (var i = 0; i < input.Length; i++)
                 {
-                    Console.Write(path2.Contains(input[i][j].Item2) ? "X" : " ");
+                    var c = input[i];
+                    switch (c)
+                    {
+                        case '[':
+                            var child = new Packet { Parent = result, List = new List<Packet>() };
+                            result.List.Add(child);
+                            result = child;
+                            break;
+                        case ',':
+                            break;
+                        case ']':
+                            result = result.Parent;
+                            break;
+                        default:
+                            var n = c.ToString();
+                            while (int.TryParse(input[i + 1].ToString(), out _))
+                            {
+                                i++;
+                                n += input[i];
+                            }
+
+                            result.List.Add(new Packet { Value = int.Parse(n) });
+                            break;
+                    }
                 }
 
-                Console.WriteLine();
+                return result.List.Single();
             }
+
+            var result = 0;
+
+            var packets = new List<Packet>();
+
+            var lines = File.ReadAllLines("C:\\git\\input13.txt");
+            var index = 1;
+            for (var i = 0; i < lines.Length; i += 3)
+            {
+                var left = Parse(lines[i]);
+                var right = Parse(lines[i + 1]);
+                Console.WriteLine(left);
+                Console.WriteLine(right);
+
+                var comparison = left.CompareTo(right);
+                if (comparison < 0)
+                {
+                    result += index;
+                }
+
+                index++;
+
+                packets.Add(left);
+                packets.Add(right);
+            }
+
+            Console.WriteLine(result);
+
+            var divider1 = Parse("[[2]]");
+            var divider2 = Parse("[[6]]");
+            packets.Add(divider1);
+            packets.Add(divider2);
+
+            var ordered = packets.OrderBy(x => x).ToList();
+
+            Console.WriteLine((ordered.IndexOf(divider1) + 1) * (ordered.IndexOf(divider2) + 1));
         }
 
         private Coord Follow(Coord head, Coord tail)
@@ -751,6 +809,49 @@
             public Func<long, int> ThrowTo { get; }
 
             public long Inspections { get; set; }
+        }
+
+        private class Packet : IComparable<Packet>
+        {
+            public int Value { get; set; }
+
+            public List<Packet> List { get; set; }
+
+            public Packet Parent { get; set; }
+
+            public int CompareTo(Packet other)
+            {
+                if (this.List == null)
+                {
+                    if (other.List == null)
+                    {
+                        return this.Value.CompareTo(other.Value);
+                    }
+
+                    return new Packet { List = new List<Packet> { this } }.CompareTo(other);
+                }
+
+                if (other.List == null)
+                {
+                    return this.CompareTo(new Packet { List = new List<Packet> { other } });
+                }
+
+                for (var i = 0; i < this.List.Count && i < other.List.Count; i++)
+                {
+                    var elementComparison = this.List[i].CompareTo(other.List[i]);
+                    if (elementComparison != 0)
+                    {
+                        return elementComparison;
+                    }
+                }
+
+                return this.List.Count.CompareTo(other.List.Count);
+            }
+
+            public override string ToString()
+            {
+                return this.List == null ? this.Value.ToString() : $"[{string.Join(',', this.List)}]";
+            }
         }
     }
 }
