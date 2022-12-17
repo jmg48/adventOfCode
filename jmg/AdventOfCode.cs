@@ -9,6 +9,7 @@
     using Dijkstra.NET.Graph.Simple;
     using Dijkstra.NET.ShortestPath;
     using FluentAssertions;
+    using Newtonsoft.Json.Linq;
     using NUnit.Framework;
 
     [TestFixture]
@@ -948,6 +949,70 @@
                     Console.WriteLine($"Part 2: {((long)xValues.Single() * 4000000) + y}");
                 }
             }
+        }
+
+        [Test]
+        public void Day16()
+        {
+            var graph = new Graph();
+            var input = File.ReadLines("C:\\git\\input16.txt")
+                .Select(line =>
+                    Regex.Match(line, @"Valve (\w+) has flow rate=(\d+); tunnels? leads? to valves? ([\w, ]+)"))
+                .Select((match) => (Node: graph.AddNode(), Name: match.Groups[1].Value, Flow: int.Parse(match.Groups[2].Value),
+                    Tunnels: match.Groups[3].Value.Split(", ")))
+                .ToDictionary(valve => valve.Name, valve => valve);
+
+            var valves = input.Values
+                .Select(valve => (valve.Node, valve.Name, valve.Flow, Tunnels: valve.Tunnels.Select(s => input[s].Node).ToList()))
+                .ToDictionary(valve => valve.Node, valve => valve);
+
+            foreach (var (from, _, _, tunnels) in valves.Values)
+            {
+                foreach (var to in tunnels)
+                {
+                    graph.Connect(from, to, 1);
+                }
+            }
+
+            var pathLengths = new Dictionary<(uint, uint), int>();
+            (int T, int Score) Move(uint from, uint to, (int T, int Score) previous)
+            {
+                if (!pathLengths.TryGetValue((from, to), out var dist))
+                {
+                    dist = graph.Dijkstra(from, to).Distance;
+                    pathLengths.Add((from, to), dist);
+                }
+
+                var tEnd = previous.T - dist - 1;
+                return (tEnd, previous.Score + (tEnd * valves[to].Flow));
+            }
+
+            var highScore = 0;
+            var twelve = valves.Values.Where(valve => valve.Flow > 0).Select(valve => valve.Node).ToArray();
+            var start = valves.Values.Single(valve => valve.Name == "AA").Node;
+            Search(start, twelve, (30, 0));
+            void Search(uint from, uint[] too, (int T, int Score) previous)
+            {
+                for (var i = 0; i < too.Length; i++)
+                {
+                    var to = too[i];
+                    var move = Move(from, to, previous);
+                    if (move.T >= 0)
+                    {
+                        if (move.Score > highScore)
+                        {
+                            highScore = move.Score;
+                        }
+
+                        if (too.Length > 1)
+                        {
+                            Search(to, too.Where(j => j != to).ToArray(), move);
+                        }
+                    }
+                }
+            }
+
+            Console.WriteLine(highScore);
         }
 
         private Coord Follow(Coord head, Coord tail)
