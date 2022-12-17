@@ -951,8 +951,9 @@
             }
         }
 
-        [Test]
-        public void Day16()
+        [TestCase(1)]
+        [TestCase(2)]
+        public void Day16(int part)
         {
             var graph = new Graph();
             var input = File.ReadLines("C:\\git\\input16.txt")
@@ -990,8 +991,8 @@
             var highScore = 0;
             var twelve = valves.Values.Where(valve => valve.Flow > 0).Select(valve => valve.Node).ToArray();
             var start = valves.Values.Single(valve => valve.Name == "AA").Node;
-            Search(start, twelve, (30, 0));
-            void Search(uint from, uint[] too, (int T, int Score) previous)
+            Search(start, twelve, (part == 1 ? 30 : 26, 0), part == 1);
+            void Search(uint from, uint[] too, (int T, int Score) previous, bool elephant)
             {
                 for (var i = 0; i < too.Length; i++)
                 {
@@ -1006,8 +1007,12 @@
 
                         if (too.Length > 1)
                         {
-                            Search(to, too.Where(j => j != to).ToArray(), move);
+                            Search(to, too.Where(j => j != to).ToArray(), move, elephant);
                         }
+                    }
+                    else if (!elephant && previous.Score >= highScore / 2)
+                    {
+                        Search(start, too, (26, previous.Score), true);
                     }
                 }
             }
