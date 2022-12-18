@@ -11,6 +11,7 @@
     using Dijkstra.NET.ShortestPath;
     using FluentAssertions;
     using NUnit.Framework;
+    using static global::AdventOfCode.AdventOfCode;
 
     [TestFixture]
     public class AdventOfCode
@@ -1140,6 +1141,94 @@
             }
 
             Console.WriteLine($"Found by enumeration: {height} in {timer.ElapsedMilliseconds}ms");
+        }
+
+        [Test]
+        public void Day18()
+        {
+            var cubes = File.ReadLines("C:\\git\\input18.txt")
+                .Select(s => s.Split(',').Select(int.Parse).ToList())
+                .Select(c => (X: c[0], Y: c[1], Z: c[2])).ToList();
+
+            var cubeHash = new HashSet<(int X, int Y, int Z)>(cubes);
+
+            (int X, int Y, int Z) Move((int X, int Y, int Z) cube, int x, int y, int z) =>
+                (cube.X + x, cube.Y + y, cube.Z + z);
+
+            var result = cubes.Sum(cube =>
+            {
+                var l = Move(cube, 1, 0, 0);
+                var r = Move(cube, -1, 0, 0);
+                var f = Move(cube, 0, 1, 0);
+                var b = Move(cube, 0, -1, 0);
+                var u = Move(cube, 0, 0, 1);
+                var d = Move(cube, 0, 0, -1);
+                return 6 - new[] { l, r, f, b, u, d }.Count(c => cubeHash.Contains(c));
+            });
+
+            Console.WriteLine(result);
+
+            var xMin = cubes.Min(cube => cube.X);
+            var xMax = cubes.Max(cube => cube.X);
+            var yMin = cubes.Min(cube => cube.Y);
+            var yMax = cubes.Max(cube => cube.Y);
+            var zMin = cubes.Min(cube => cube.Z);
+            var zMax = cubes.Max(cube => cube.Z);
+
+            var outside = new HashSet<(int X, int Y, int Z)>();
+
+            var found = true;
+            while (found)
+            {
+                found = false;
+                for (var x = xMin - 1; x <= xMax + 1; x++)
+                {
+                    for (var y = yMin - 1; y <= yMax + 1; y++)
+                    {
+                        for (var z = zMin - 1; z <= zMax + 1; z++)
+                        {
+                            var cube = (x, y, z);
+                            if (outside.Contains(cube) || cubeHash.Contains(cube))
+                            {
+                                continue;
+                            }
+
+                            if (x == xMin - 1 || y == yMin - 1 || z == zMin - 1 || x == xMax + 1 || y == yMax + 1 ||
+                                z == zMax + 1)
+                            {
+                                outside.Add(cube);
+                                found = true;
+                                continue;
+                            }
+
+                            var l = Move(cube, 1, 0, 0);
+                            var r = Move(cube, -1, 0, 0);
+                            var f = Move(cube, 0, 1, 0);
+                            var b = Move(cube, 0, -1, 0);
+                            var u = Move(cube, 0, 0, 1);
+                            var d = Move(cube, 0, 0, -1);
+                            if (new[] { l, r, f, b, u, d }.Any(c => outside.Contains(c)))
+                            {
+                                outside.Add(cube);
+                                found = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var result2 = cubes.Sum(cube =>
+            {
+                var l = Move(cube, 1, 0, 0);
+                var r = Move(cube, -1, 0, 0);
+                var f = Move(cube, 0, 1, 0);
+                var b = Move(cube, 0, -1, 0);
+                var u = Move(cube, 0, 0, 1);
+                var d = Move(cube, 0, 0, -1);
+                return new[] { l, r, f, b, u, d }.Count(c => outside.Contains(c));
+            });
+
+            Console.WriteLine(result2);
         }
 
         private Coord Follow(Coord head, Coord tail)
