@@ -11,7 +11,6 @@
     using Dijkstra.NET.ShortestPath;
     using FluentAssertions;
     using NUnit.Framework;
-    using static global::AdventOfCode.AdventOfCode;
 
     [TestFixture]
     public class AdventOfCode
@@ -31,7 +30,7 @@
         }
 
         [Test]
-        public void DayOne()
+        public void Day1()
         {
             Console.WriteLine(File.ReadLines("C:\\git\\input.txt")
                 .Aggregate(
@@ -71,7 +70,7 @@
         }
 
         [Test]
-        public void DayTwo_1()
+        public void Day2_1()
         {
             var total = 0;
 
@@ -134,7 +133,7 @@
         }
 
         [Test]
-        public void DayTwo_2()
+        public void Day2_2()
         {
             var total = 0;
 
@@ -197,7 +196,7 @@
         }
 
         [Test]
-        public void DayThree_1()
+        public void Day3_1()
         {
             var total = 0;
             using var reader = new StreamReader("C:\\git\\input3.txt");
@@ -215,7 +214,7 @@
         }
 
         [Test]
-        public void DayThree_2()
+        public void Day3_2()
         {
             var total = 0;
             using var reader = new StreamReader("C:\\git\\input3.txt");
@@ -234,7 +233,7 @@
         }
 
         [Test]
-        public void DayFour_1()
+        public void Day4_1()
         {
             var contains = 0;
             var overlaps = 0;
@@ -263,7 +262,7 @@
 
         [TestCase(1)]
         [TestCase(2)]
-        public void DayFive(int part)
+        public void Day5(int part)
         {
             using var reader = new StreamReader("C:\\git\\input5.txt");
             var stackLines = new List<string>();
@@ -1146,6 +1145,9 @@
         [Test]
         public void Day18()
         {
+            var timer = new Stopwatch();
+            timer.Start();
+
             var cubes = File.ReadLines("C:\\git\\input18.txt")
                 .Select(s => s.Split(',').Select(int.Parse).ToList())
                 .Select(c => new Cube(c[0], c[1], c[2])).ToList();
@@ -1164,7 +1166,8 @@
                 yield return Move(cube, 0, 0, -1);
             }
 
-            Console.WriteLine($"Part 1: {cubes.Sum(cube => 6 - Neighbours(cube).Count(c => cubeHash.Contains(c)))}");
+            Console.WriteLine($"Part 1: {cubes.Sum(cube => 6 - Neighbours(cube).Count(c => cubeHash.Contains(c)))} in {timer.ElapsedMilliseconds}ms");
+            timer.Restart();
 
             var xMin = cubes.Min(cube => cube.X);
             var xMax = cubes.Max(cube => cube.X);
@@ -1208,7 +1211,7 @@
                 }
             }
 
-            Console.WriteLine($"Part 2: {cubes.Sum(cube => Neighbours(cube).Count(c => outside.Contains(c)))}");
+            Console.WriteLine($"Part 2: {cubes.Sum(cube => Neighbours(cube).Count(c => outside.Contains(c)))} in {timer.ElapsedMilliseconds}ms");
         }
 
         private Coord Follow(Coord head, Coord tail)
