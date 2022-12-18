@@ -1148,25 +1148,23 @@
         {
             var cubes = File.ReadLines("C:\\git\\input18.txt")
                 .Select(s => s.Split(',').Select(int.Parse).ToList())
-                .Select(c => (X: c[0], Y: c[1], Z: c[2])).ToList();
+                .Select(c => new Cube(c[0], c[1], c[2])).ToList();
 
-            var cubeHash = new HashSet<(int X, int Y, int Z)>(cubes);
+            var cubeHash = new HashSet<Cube>(cubes);
 
-            (int X, int Y, int Z) Move((int X, int Y, int Z) cube, int x, int y, int z) =>
-                (cube.X + x, cube.Y + y, cube.Z + z);
+            Cube Move(Cube cube, int x, int y, int z) => new(cube.X + x, cube.Y + y, cube.Z + z);
 
-            var result = cubes.Sum(cube =>
+            IEnumerable<Cube> Neighbours(Cube cube)
             {
-                var l = Move(cube, 1, 0, 0);
-                var r = Move(cube, -1, 0, 0);
-                var f = Move(cube, 0, 1, 0);
-                var b = Move(cube, 0, -1, 0);
-                var u = Move(cube, 0, 0, 1);
-                var d = Move(cube, 0, 0, -1);
-                return 6 - new[] { l, r, f, b, u, d }.Count(c => cubeHash.Contains(c));
-            });
+                yield return Move(cube, 1, 0, 0);
+                yield return Move(cube, -1, 0, 0);
+                yield return Move(cube, 0, 1, 0);
+                yield return Move(cube, 0, -1, 0);
+                yield return Move(cube, 0, 0, 1);
+                yield return Move(cube, 0, 0, -1);
+            }
 
-            Console.WriteLine(result);
+            Console.WriteLine($"Part 1: {cubes.Sum(cube => 6 - Neighbours(cube).Count(c => cubeHash.Contains(c)))}");
 
             var xMin = cubes.Min(cube => cube.X);
             var xMax = cubes.Max(cube => cube.X);
@@ -1175,7 +1173,7 @@
             var zMin = cubes.Min(cube => cube.Z);
             var zMax = cubes.Max(cube => cube.Z);
 
-            var outside = new HashSet<(int X, int Y, int Z)>();
+            var outside = new HashSet<Cube>();
 
             var found = true;
             while (found)
@@ -1187,27 +1185,20 @@
                     {
                         for (var z = zMin - 1; z <= zMax + 1; z++)
                         {
-                            var cube = (x, y, z);
+                            var cube = new Cube(x, y, z);
                             if (outside.Contains(cube) || cubeHash.Contains(cube))
                             {
                                 continue;
                             }
 
-                            if (x == xMin - 1 || y == yMin - 1 || z == zMin - 1 || x == xMax + 1 || y == yMax + 1 ||
-                                z == zMax + 1)
+                            if (x == xMin - 1 || y == yMin - 1 || z == zMin - 1 || x == xMax + 1 || y == yMax + 1 || z == zMax + 1)
                             {
                                 outside.Add(cube);
                                 found = true;
                                 continue;
                             }
 
-                            var l = Move(cube, 1, 0, 0);
-                            var r = Move(cube, -1, 0, 0);
-                            var f = Move(cube, 0, 1, 0);
-                            var b = Move(cube, 0, -1, 0);
-                            var u = Move(cube, 0, 0, 1);
-                            var d = Move(cube, 0, 0, -1);
-                            if (new[] { l, r, f, b, u, d }.Any(c => outside.Contains(c)))
+                            if (Neighbours(cube).Any(c => outside.Contains(c)))
                             {
                                 outside.Add(cube);
                                 found = true;
@@ -1217,18 +1208,7 @@
                 }
             }
 
-            var result2 = cubes.Sum(cube =>
-            {
-                var l = Move(cube, 1, 0, 0);
-                var r = Move(cube, -1, 0, 0);
-                var f = Move(cube, 0, 1, 0);
-                var b = Move(cube, 0, -1, 0);
-                var u = Move(cube, 0, 0, 1);
-                var d = Move(cube, 0, 0, -1);
-                return new[] { l, r, f, b, u, d }.Count(c => outside.Contains(c));
-            });
-
-            Console.WriteLine(result2);
+            Console.WriteLine($"Part 2: {cubes.Sum(cube => Neighbours(cube).Count(c => outside.Contains(c)))}");
         }
 
         private Coord Follow(Coord head, Coord tail)
@@ -1267,6 +1247,8 @@
         private record Coord(int X, int Y);
 
         private record Coord<T>(T X, T Y);
+
+        private record Cube(int X, int Y, int Z);
 
         private class Monkey
         {
