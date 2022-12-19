@@ -1244,6 +1244,8 @@
                 var bestPath = new List<(Resource Bank, Resource Robots)>();
                 var path = new Stack<(Resource Bank, Resource Robots)>();
 
+                var maxOreCost = Math.Max(Math.Max(geodeCost.Ore, obsidianCost.Ore), Math.Max(clayCost.Ore, oreCost.Ore));
+
                 void Search(int t, Resource bank, Resource robots)
                 {
                     var newBank = bank + robots;
@@ -1296,12 +1298,12 @@
                     }
 
                     var tryOre = bank - oreCost;
-                    if (!tryOre.IsOverdrawn())
+                    if (!tryOre.IsOverdrawn() && robots.Ore <= maxOreCost)
                     {
                         Search(t + 1, tryOre + robots, robots with { Ore = robots.Ore + 1 });
                     }
 
-                    if (bank.Ore < Math.Max(Math.Max(geodeCost.Ore, obsidianCost.Ore), Math.Max(clayCost.Ore, oreCost.Ore)))
+                    if (bank.Ore < maxOreCost)
                     {
                         Search(t + 1, newBank, robots);
                     }
@@ -1310,8 +1312,6 @@
                 }
 
                 Search(0,  new Resource(0, 0, 0, 0), new Resource(1, 0, 0, 0));
-
-                Console.WriteLine($"{id} : {bestScore}");
 
                 result1 += bestScore.Geode * id;
                 result2 *= bestScore.Geode;
