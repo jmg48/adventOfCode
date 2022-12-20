@@ -1244,7 +1244,7 @@
                 var bestPath = new List<(Resource Bank, Resource Robots)>();
                 var path = new Stack<(Resource Bank, Resource Robots)>();
 
-                var maxOreCost = Math.Max(Math.Max(geodeCost.Ore, obsidianCost.Ore), Math.Max(clayCost.Ore, oreCost.Ore));
+                var maxOreCost = new[] { oreCost, clayCost, obsidianCost, geodeCost }.Max(cost => cost.Ore);
 
                 void Search(int t, Resource bank, Resource robots)
                 {
@@ -1321,6 +1321,63 @@
             Console.WriteLine($"Part {part}: {result} in {timer.ElapsedMilliseconds}ms");
         }
 
+        [TestCase(1)]
+        [TestCase(2)]
+        public void Day20(int part)
+        {
+            var rounds = part switch { 1 => 1, 2 => 10 };
+            var multiple = part switch { 1 => 1, 2 => 811589153 };
+
+            int PosMod(int n, int m) => ((n % m) + m) % m;
+
+            var digits = File.ReadLines("C:\\git\\input20.txt").Select(i => new Digit(long.Parse(i) * multiple)).ToList();
+
+            var listSize = digits.Count;
+            for (var i = 0; i < listSize; i++)
+            {
+                digits[i].Prev = digits[PosMod(i - 1, listSize)];
+                digits[i].Next = digits[PosMod(i + 1, listSize)];
+            }
+
+            for (int round = 0; round < rounds; round++)
+            {
+                foreach (var digit in digits)
+                {
+                    var steps = digit.Value % (listSize - 1);
+                    steps = (steps + (listSize - 1)) % (listSize - 1);
+
+                    for (var i = 0; i < steps; i++)
+                    {
+                        var a = digit.Prev;
+                        var c = digit.Next;
+                        var d = c.Next;
+                        a.Next = c;
+                        c.Prev = a;
+                        c.Next = digit;
+                        digit.Prev = c;
+                        digit.Next = d;
+                        d.Prev = digit;
+                    }
+                }
+            }
+
+            var cursor = digits.Single(digit => digit.Value == 0);
+
+            long result = 0;
+            for (var i = 0; i < 3; i++)
+            {
+                for (var j = 0; j < 1000; j++)
+                {
+                    cursor = cursor.Next;
+                }
+
+                Console.WriteLine(cursor.Value);
+                result += cursor.Value;
+            }
+
+            Console.WriteLine(result);
+        }
+
         private Coord Follow(Coord head, Coord tail)
         {
             var horiz = head.X - tail.X;
@@ -1367,6 +1424,18 @@
             public static Resource operator -(Resource a, Resource b) => new(a.Ore - b.Ore, a.Clay - b.Clay, a.Obsidian - b.Obsidian, a.Geode - b.Geode);
 
             public bool IsOverdrawn() => this.Ore < 0 || this.Clay < 0 || this.Obsidian < 0 || this.Geode < 0;
+        }
+
+        [DebuggerDisplay("{Prev.Value,5} >> {Value,5} >> {Next.Value,5}")]
+        private class Digit
+        {
+            public Digit(long value) => this.Value = value;
+
+            public long Value { get; }
+
+            public Digit Prev { get; set; }
+
+            public Digit Next { get; set; }
         }
 
         private class Monkey
