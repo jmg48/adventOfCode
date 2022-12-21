@@ -6,7 +6,9 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Net.Http;
     using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
     using Dijkstra.NET.Graph.Simple;
     using Dijkstra.NET.ShortestPath;
     using FluentAssertions;
@@ -1330,7 +1332,7 @@
 
             int PosMod(int n, int m) => ((n % m) + m) % m;
 
-            var digits = File.ReadLines("C:\\git\\input20.txt").Select(i => new Digit(long.Parse(i) * multiple)).ToList();
+            var digits = File.ReadLines("C:\\git\\input20.txt").Select(i => new Linked<long>(long.Parse(i) * multiple)).ToList();
 
             var listSize = digits.Count;
             for (var i = 0; i < listSize; i++)
@@ -1339,7 +1341,7 @@
                 digits[i].Next = digits[PosMod(i + 1, listSize)];
             }
 
-            for (int round = 0; round < rounds; round++)
+            for (var round = 0; round < rounds; round++)
             {
                 foreach (var digit in digits)
                 {
@@ -1371,7 +1373,6 @@
                     cursor = cursor.Next;
                 }
 
-                Console.WriteLine(cursor.Value);
                 result += cursor.Value;
             }
 
@@ -1427,15 +1428,15 @@
         }
 
         [DebuggerDisplay("{Prev.Value,5} >> {Value,5} >> {Next.Value,5}")]
-        private class Digit
+        private class Linked<T>
         {
-            public Digit(long value) => this.Value = value;
+            public Linked(T value) => this.Value = value;
 
-            public long Value { get; }
+            public T Value { get; }
 
-            public Digit Prev { get; set; }
+            public Linked<T> Prev { get; set; }
 
-            public Digit Next { get; set; }
+            public Linked<T> Next { get; set; }
         }
 
         private class Monkey
