@@ -1438,33 +1438,23 @@
                 });
             }
 
-            MonkeyDo Reduce(MonkeyDo arg)
+            MonkeyDo Reduce(MonkeyDo arg) => arg switch
             {
-                switch (arg)
-                {
-                    case MonkeyDo.Unknown unknown:
-                        return unknown;
-                    case MonkeyDo.Constant constant:
-                        return constant;
-                    case MonkeyDo.Arithmetic arithmetic:
-                        var arg1 = Reduce(arithmetic.Arg1);
-                        var arg2 = Reduce(arithmetic.Arg2);
-                        if (arg1 is MonkeyDo.Constant val1 && arg2 is MonkeyDo.Constant val2)
-                        {
-                            return new MonkeyDo.Constant(arithmetic.Op switch
-                            {
-                                "+" => val1.Value + val2.Value,
-                                "-" => val1.Value - val2.Value,
-                                "*" => val1.Value * val2.Value,
-                                "/" => val1.Value / val2.Value,
-                            });
-                        }
+                MonkeyDo.Unknown unknown => unknown,
+                MonkeyDo.Constant constant => constant,
+                MonkeyDo.Arithmetic arithmetic => TryEval(new MonkeyDo.Arithmetic(Reduce(arithmetic.Arg1), arithmetic.Op, Reduce(arithmetic.Arg2))),
+            };
 
-                        return new MonkeyDo.Arithmetic(arg1, arithmetic.Op, arg2);
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(arg));
-                }
-            }
+            MonkeyDo TryEval(MonkeyDo.Arithmetic arithmetic) =>
+                arithmetic.Arg1 is MonkeyDo.Constant val1 && arithmetic.Arg2 is MonkeyDo.Constant val2
+                    ? new MonkeyDo.Constant(arithmetic.Op switch
+                    {
+                        "+" => val1.Value + val2.Value,
+                        "-" => val1.Value - val2.Value,
+                        "*" => val1.Value * val2.Value,
+                        "/" => val1.Value / val2.Value,
+                    })
+                    : arithmetic;
 
             var lhs = Reduce(monkeys[rootArg1].Value);
             var rhs = Reduce(monkeys[rootArg2].Value);
@@ -1480,40 +1470,24 @@
                     if (expression.Arg1 is MonkeyDo.Constant arg1)
                     {
                         lhs = expression.Arg2;
-                        switch (expression.Op)
+                        rhs = expression.Op switch
                         {
-                            case "+":
-                                rhs = new MonkeyDo.Constant(constant.Value - arg1.Value);
-                                break;
-                            case "-":
-                                rhs = new MonkeyDo.Constant(arg1.Value - constant.Value);
-                                break;
-                            case "*":
-                                rhs = new MonkeyDo.Constant(constant.Value / arg1.Value);
-                                break;
-                            case "/":
-                                rhs = new MonkeyDo.Constant(arg1.Value / constant.Value);
-                                break;
-                        }
+                            "+" => new MonkeyDo.Constant(constant.Value - arg1.Value),
+                            "-" => new MonkeyDo.Constant(arg1.Value - constant.Value),
+                            "*" => new MonkeyDo.Constant(constant.Value / arg1.Value),
+                            "/" => new MonkeyDo.Constant(arg1.Value / constant.Value),
+                        };
                     }
                     else if (expression.Arg2 is MonkeyDo.Constant arg2)
                     {
                         lhs = expression.Arg1;
-                        switch (expression.Op)
+                        rhs = expression.Op switch
                         {
-                            case "+":
-                                rhs = new MonkeyDo.Constant(constant.Value - arg2.Value);
-                                break;
-                            case "-":
-                                rhs = new MonkeyDo.Constant(constant.Value + arg2.Value);
-                                break;
-                            case "*":
-                                rhs = new MonkeyDo.Constant(constant.Value / arg2.Value);
-                                break;
-                            case "/":
-                                rhs = new MonkeyDo.Constant(constant.Value * arg2.Value);
-                                break;
-                        }
+                            "+" => new MonkeyDo.Constant(constant.Value - arg2.Value),
+                            "-" => new MonkeyDo.Constant(constant.Value + arg2.Value),
+                            "*" => new MonkeyDo.Constant(constant.Value / arg2.Value),
+                            "/" => new MonkeyDo.Constant(constant.Value * arg2.Value),
+                        };
                     }
                 }
             }
