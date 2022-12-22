@@ -1555,8 +1555,8 @@
                     {
                         (-1, 2, 2) => (new Coord(50, 149 - dest.Y), 0), // ae
                         (0, 0, 2) => (new Coord(0, 149 - dest.Y), 0), // ae
-                        (-1, 3, 2) => (new Coord(dest.Y - 100, 0), 0), // eg
-                        (1, -1, 3) => (new Coord(0, dest.X + 100), 1), // eg
+                        (-1, 3, 2) => (new Coord(dest.Y - 100, 0), 1), // eg
+                        (1, -1, 3) => (new Coord(0, dest.X + 100), 0), // eg
                         (0, 1, 3) => (new Coord(50, dest.X + 50), 0), // ac
                         (0, 1, 2) => (new Coord(dest.Y - 50, 100), 1), // ac
                         (0, 4, 1) => (new Coord(dest.X + 100, 0), 1), // gh
@@ -1571,19 +1571,16 @@
                 }
             }
 
-            Console.WriteLine(position);
             while (pathIndex < path.Length)
             {
                 switch (path[pathIndex])
                 {
                     case 'L':
                         facing = (facing + 3) % 4;
-                        Console.Write($"L -> {facing}");
                         pathIndex++;
                         break;
                     case 'R':
                         facing = (facing + 1) % 4;
-                        Console.Write($"R -> {facing}");
                         pathIndex++;
                         break;
                     default:
@@ -1594,8 +1591,6 @@
                             dist = (dist * 10) + value;
                             pathIndex++;
                         }
-
-                        Console.Write($" -> {dist}");
 
                         for (var i = 0; i < dist; i++)
                         {
@@ -1608,13 +1603,11 @@
                             (position, facing) = (dest, newFacing);
                         }
 
-                        Console.WriteLine($" -> {position}");
-
                         break;
                 }
             }
 
-            Console.WriteLine($"{(1000 * (position.Y + 1)) + (4 * (position.Y + 1)) + facing}");
+            Console.WriteLine($"{(1000 * (position.Y + 1)) + (4 * (position.X + 1)) + facing}");
         }
 
         private Coord Follow(Coord head, Coord tail)
