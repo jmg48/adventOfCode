@@ -1501,6 +1501,9 @@
         [TestCase(2)]
         public void Day22(int part)
         {
+            var timer = new Stopwatch();
+            timer.Start();
+
             var lines = File.ReadAllLines("C:\\git\\input22.txt");
             var maze = lines.Take(lines.Length - 2).Select(line => line.ToList()).ToList();
             var height = maze.Count;
@@ -1537,7 +1540,6 @@
                         dest = new Coord((dest.X + vector.X + width) % width, (dest.Y + vector.Y + height) % height);
                     }
                     while (Maze(dest) == ' ');
-
                     return (dest, facing);
                 }
                 else
@@ -1550,7 +1552,6 @@
 
                     var faceX = ((dest.X + 50) / 50) - 1;
                     var faceY = ((dest.Y + 50) / 50) - 1;
-
                     return (faceX, faceY, facing) switch
                     {
                         (-1, 2, 2) => (new Coord(50, 149 - dest.Y), 0), // ae
@@ -1607,7 +1608,7 @@
                 }
             }
 
-            Console.WriteLine($"{(1000 * (position.Y + 1)) + (4 * (position.X + 1)) + facing}");
+            Console.WriteLine($"{(1000 * (position.Y + 1)) + (4 * (position.X + 1)) + facing} in {timer.ElapsedMilliseconds}ms");
         }
 
         private Coord Follow(Coord head, Coord tail)
@@ -1642,10 +1643,6 @@
 
             return tail;
         }
-
-        private record Coord(int X, int Y);
-
-        private record Coord<T>(T X, T Y);
 
         private record Cube(int X, int Y, int Z);
 
