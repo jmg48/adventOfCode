@@ -26,7 +26,7 @@ public class Day2
     {
         var total = 0;
 
-        using var reader = new StreamReader("C:\\git\\input2.txt");
+        using var reader = new StreamReader("C:\\git\\advent-of-code\\input2.txt");
         while (!reader.EndOfStream)
         {
             var line = reader.ReadLine();
@@ -80,7 +80,7 @@ public class Day2
     {
         var total = 0;
 
-        using var reader = new StreamReader("C:\\git\\input2.txt");
+        using var reader = new StreamReader("C:\\git\\advent-of-code\\input2.txt");
         while (!reader.EndOfStream)
         {
             var line = reader.ReadLine();

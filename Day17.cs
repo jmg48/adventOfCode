@@ -19,7 +19,7 @@ public class Day17
 
         var blocks = part switch { 1 => 2022, 2 => 1000000000000 };
 
-        var jets = File.ReadLines("C:\\git\\input17.txt").Single().ToCharArray();
+        var jets = File.ReadLines("C:\\git\\advent-of-code\\input17.txt").Single().ToCharArray();
 
         var sprites = new List<List<Coord<long>>>
         {

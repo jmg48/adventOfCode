@@ -15,7 +15,7 @@ public class Day12
     public void Test()
     {
         var graph = new Graph();
-        var input = File.ReadLines("C:\\git\\input12.txt").Select(line => line.Select(c => (c, graph.AddNode())).ToList<(char C, uint N)>()).ToList();
+        var input = File.ReadLines("C:\\git\\advent-of-code\\input12.txt").Select(line => line.Select(c => (c, graph.AddNode())).ToList<(char C, uint N)>()).ToList();
 
         int Height((char C, uint N) cell) => cell.C switch
         {

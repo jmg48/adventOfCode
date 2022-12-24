@@ -14,7 +14,7 @@ public class Day5
     [TestCase(2)]
     public void Test(int part)
     {
-        using var reader = new StreamReader("C:\\git\\input5.txt");
+        using var reader = new StreamReader("C:\\git\\advent-of-code\\input5.txt");
         var stackLines = new List<string>();
         while (!reader.EndOfStream)
         {

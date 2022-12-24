@@ -12,7 +12,7 @@ public class Day14
     [TestCase(2)]
     public void Test(int part)
     {
-        var input = File.ReadLines("C:\\git\\input14.txt")
+        var input = File.ReadLines("C:\\git\\advent-of-code\\input14.txt")
             .Select(line =>
                 line.Split(" -> ").Select(s =>
                     new Coord(int.Parse((string)s.Split(',')[0]), int.Parse((string)s.Split(',')[1]))).ToList()).ToList();

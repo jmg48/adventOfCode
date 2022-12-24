@@ -13,7 +13,7 @@ public class Day3
     public void Part1()
     {
         var total = 0;
-        using var reader = new StreamReader("C:\\git\\input3.txt");
+        using var reader = new StreamReader("C:\\git\\advent-of-code\\input3.txt");
         while (!reader.EndOfStream)
         {
             var line = reader.ReadLine();
@@ -31,7 +31,7 @@ public class Day3
     public void Part2()
     {
         var total = 0;
-        using var reader = new StreamReader("C:\\git\\input3.txt");
+        using var reader = new StreamReader("C:\\git\\advent-of-code\\input3.txt");
         while (!reader.EndOfStream)
         {
             var line1 = new HashSet<char>(reader.ReadLine());

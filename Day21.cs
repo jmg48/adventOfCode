@@ -14,7 +14,7 @@ public class Day21
     public void Part1()
     {
         var monkeys = new Dictionary<string, Lazy<long>>();
-        foreach (var match in File.ReadLines("C:\\git\\input21.txt").Select(line => Regex.Match(line, @"(\w+): ((\w+) ([+\-*/]) (\w+)|\d+)")))
+        foreach (var match in File.ReadLines("C:\\git\\advent-of-code\\input21.txt").Select(line => Regex.Match(line, @"(\w+): ((\w+) ([+\-*/]) (\w+)|\d+)")))
         {
             monkeys[match.Groups[1].Value] = new Lazy<long>(() =>
             {
@@ -41,7 +41,7 @@ public class Day21
         var monkeys = new Dictionary<string, Lazy<MonkeyDo>>();
         var rootArg1 = string.Empty;
         var rootArg2 = string.Empty;
-        foreach (var match in File.ReadLines("C:\\git\\input21.txt").Select(line => Regex.Match(line, @"(\w+): ((\w+) ([+\-*/]) (\w+)|\d+)")))
+        foreach (var match in File.ReadLines("C:\\git\\advent-of-code\\input21.txt").Select(line => Regex.Match(line, @"(\w+): ((\w+) ([+\-*/]) (\w+)|\d+)")))
         {
             var name = match.Groups[1].Value;
             var expr = match.Groups[2].Value;

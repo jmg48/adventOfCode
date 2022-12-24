@@ -16,7 +16,7 @@ internal class Day24
         var timer = new Stopwatch();
         timer.Start();
 
-        var input = File.ReadAllLines("C:\\git\\input24.txt");
+        var input = File.ReadAllLines("C:\\git\\advent-of-code\\input24.txt");
 
         var height = input.Length - 2;
         var width = input[0].Length - 2;

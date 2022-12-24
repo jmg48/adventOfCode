@@ -21,7 +21,7 @@ public class Day16
         timer.Start();
 
         var graph = new Graph();
-        var input = File.ReadLines("C:\\git\\input16.txt")
+        var input = File.ReadLines("C:\\git\\advent-of-code\\input16.txt")
             .Select(line =>
                 Regex.Match(line, @"Valve (\w+) has flow rate=(\d+); tunnels? leads? to valves? ([\w, ]+)"))
             .Select((match) => (Node: graph.AddNode(), Name: match.Groups[1].Value, Flow: int.Parse(match.Groups[2].Value),

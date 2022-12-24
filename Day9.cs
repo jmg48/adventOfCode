@@ -15,7 +15,7 @@ public class Day9
         var coords = Enumerable.Range(0, 10).Select(_ => new Coord(0, 0)).ToList();
         var path = new List<List<Coord>>();
 
-        foreach (var line in File.ReadLines("C:\\git\\input9.txt").Select(line => line.Split(' ')))
+        foreach (var line in File.ReadLines("C:\\git\\advent-of-code\\input9.txt").Select(line => line.Split(' ')))
         {
             var direction = line[0];
             var length = int.Parse(line[1]);

@@ -16,7 +16,7 @@ public class Day22
         var timer = new Stopwatch();
         timer.Start();
 
-        var lines = File.ReadAllLines("C:\\git\\input22.txt");
+        var lines = File.ReadAllLines("C:\\git\\advent-of-code\\input22.txt");
         var maze = lines.Take(lines.Length - 2).Select(line => line.ToList()).ToList();
         var height = maze.Count;
         var width = maze.Max(line => line.Count);

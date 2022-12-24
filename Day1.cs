@@ -12,7 +12,7 @@ public class Day1
     [Test]
     public void Test()
     {
-        Console.WriteLine(File.ReadLines("C:\\git\\input.txt")
+        Console.WriteLine(File.ReadLines("C:\\git\\advent-of-code\\input.txt")
             .Aggregate(
                 (0, 0),
                 (a, s) => string.IsNullOrWhiteSpace(s)
@@ -20,7 +20,7 @@ public class Day1
                     : (a.Item1, a.Item2 + int.Parse((string)s)),
                 a => a.Item1));
 
-        var top3 = File.ReadLines("C:\\git\\input.txt")
+        var top3 = File.ReadLines("C:\\git\\advent-of-code\\input.txt")
             .Aggregate(
                 (new List<int> { 0, 0, 0 }, 0),
                 (a, s) => string.IsNullOrWhiteSpace(s)
@@ -31,7 +31,7 @@ public class Day1
         var totals = new List<int>();
 
         var currentRunningTotal = 0;
-        using var reader = new StreamReader("C:\\git\\input.txt");
+        using var reader = new StreamReader("C:\\git\\advent-of-code\\input.txt");
         while (!reader.EndOfStream)
         {
             var line = reader.ReadLine();

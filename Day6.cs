@@ -14,7 +14,7 @@ public class Day6
     public void Test(int part)
     {
         var n = part switch { 1 => 4, 2 => 14 };
-        var input = File.ReadAllText("C:\\git\\input6.txt");
+        var input = File.ReadAllText("C:\\git\\advent-of-code\\input6.txt");
         Console.WriteLine(Enumerable.Range(n, input.Length - n).First(i => new HashSet<char>(input.Skip(i - n).Take(n)).Count == n));
     }
 }

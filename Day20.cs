@@ -18,7 +18,7 @@ public class Day20
 
         int PosMod(int n, int m) => ((n % m) + m) % m;
 
-        var digits = File.ReadLines("C:\\git\\input20.txt").Select(i => new Linked<long>(long.Parse((string)i) * multiple)).ToList();
+        var digits = File.ReadLines("C:\\git\\advent-of-code\\input20.txt").Select(i => new Linked<long>(long.Parse((string)i) * multiple)).ToList();
 
         var listSize = digits.Count;
         for (var i = 0; i < listSize; i++)

@@ -13,7 +13,7 @@
         public void Test()
         {
             var grid = new HashSet<Coord>();
-            var input = File.ReadAllLines("C:\\git\\input23.txt").Select(line => line.ToList()).ToList();
+            var input = File.ReadAllLines("C:\\git\\advent-of-code\\input23.txt").Select(line => line.ToList()).ToList();
             for (var i = 0; i < input.Count; i++)
             {
                 for (var j = 0; j < input[i].Count; j++)

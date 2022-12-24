@@ -14,7 +14,7 @@ public class Day10
         var cycle = 1;
         var x = 1;
         var s = new List<int> { 0, 1 };
-        foreach (var line in File.ReadLines("C:\\git\\input10.txt"))
+        foreach (var line in File.ReadLines("C:\\git\\advent-of-code\\input10.txt"))
         {
             switch (line[..4])
             {

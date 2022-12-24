@@ -13,7 +13,7 @@ public class Day4
     {
         var contains = 0;
         var overlaps = 0;
-        using var reader = new StreamReader("C:\\git\\input4.txt");
+        using var reader = new StreamReader("C:\\git\\advent-of-code\\input4.txt");
         while (!reader.EndOfStream)
         {
             var match = Regex.Match(reader.ReadLine(), @"(\d+)-(\d+),(\d+)-(\d+)");

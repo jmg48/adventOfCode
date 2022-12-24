@@ -13,7 +13,7 @@ public class Day15
     [Test]
     public void Test()
     {
-        var input = File.ReadLines("C:\\git\\input15.txt")
+        var input = File.ReadLines("C:\\git\\advent-of-code\\input15.txt")
             .Select(line => Regex.Match(line, @"Sensor at x=(-?\d+), y=(-?\d+): closest beacon is at x=(-?\d+), y=(-?\d+)"))
             .Select(match => (
                 Sensor: new Coord(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value)),

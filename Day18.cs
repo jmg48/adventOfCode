@@ -16,7 +16,7 @@ public class Day18
         var timer = new Stopwatch();
         timer.Start();
 
-        var cubes = File.ReadLines("C:\\git\\input18.txt")
+        var cubes = File.ReadLines("C:\\git\\advent-of-code\\input18.txt")
             .Select(s => s.Split(',').Select(int.Parse).ToList())
             .Select(c => new Cube(c[0], c[1], c[2])).ToList();
 

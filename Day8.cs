@@ -14,7 +14,7 @@ public class Day8
     {
         var visibleTrees = 0;
         var bestScore = 0;
-        var grid = new List<List<int>>(File.ReadLines("C:\\git\\input8.txt")
+        var grid = new List<List<int>>(File.ReadLines("C:\\git\\advent-of-code\\input8.txt")
             .Select(line => line.Select(c => int.Parse(new[] { c })).ToList()));
 
         for (var i = 0; i < grid.Count; i++)

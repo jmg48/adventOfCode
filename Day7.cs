@@ -16,7 +16,7 @@ public class Day7
         var dirSizes = new ConcurrentDictionary<string, int>();
 
         var paths = new Stack<string>(new[] { string.Empty });
-        foreach (var line in File.ReadLines("C:\\git\\input7.txt"))
+        foreach (var line in File.ReadLines("C:\\git\\advent-of-code\\input7.txt"))
         {
             if (line.StartsWith("$ cd "))
             {

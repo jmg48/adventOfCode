@@ -50,7 +50,7 @@ public class Day13
 
         var packets = new List<Packet>();
 
-        var lines = File.ReadAllLines("C:\\git\\input13.txt");
+        var lines = File.ReadAllLines("C:\\git\\advent-of-code\\input13.txt");
         var index = 1;
         for (var i = 0; i < lines.Length; i += 3)
         {

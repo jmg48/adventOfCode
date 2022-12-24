@@ -21,7 +21,7 @@ public class Day19
         var minutes = part switch { 1 => 24, 2 => 32 };
         var take = part switch { 1 => 30, 2 => 3 };
 
-        var blueprints = File.ReadLines("C:\\git\\input19.txt")
+        var blueprints = File.ReadLines("C:\\git\\advent-of-code\\input19.txt")
             .Select(line => Regex.Match(
                 line,
                 @"Blueprint (\d+): Each ore robot costs (\d+) ore. Each clay robot costs (\d+) ore. Each obsidian robot costs (\d+) ore and (\d+) clay. Each geode robot costs (\d+) ore and (\d+) obsidian."))
