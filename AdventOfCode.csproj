@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AdventOfCode2021\**" />
+    <EmbeddedResource Remove="AdventOfCode2021\**" />
+    <None Remove="AdventOfCode2021\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dijkstra.net" Version="1.2.1" />
     <PackageReference Include="FluentAssertions" Version="6.8.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
