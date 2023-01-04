@@ -24,8 +24,17 @@ public class Day11
             new(new List<long> { 62, 80, 58, 57, 93, 56 }, old => old * old, n => n % 13 == 0 ? 6 : 4),
         };
 
-        var rounds = part == 1 ? 20 : 10000;
-        Func<long, long> reduce = part == 1 ? n => n / 3 : n => n % (2 * 3 * 5 * 7 * 11 * 13 * 17 * 19);
+        var rounds = part switch
+        {
+            1 => 20,
+            2 => 10000,
+        };
+
+        Func<long, long> reduce = part switch
+        {
+            1 => n => n / 3,
+            2 => n => n % (2 * 3 * 5 * 7 * 11 * 13 * 17 * 19),
+        };
 
         for (var round = 0; round < rounds; round++)
         {

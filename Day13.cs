@@ -15,9 +15,24 @@ public class Day13
         Packet Parse(string input)
         {
             var result = new Packet { List = new List<Packet>() };
-            for (var i = 0; i < input.Length; i++)
+            var parsingNumber = false;
+            var number = 0;
+            foreach (var c in input)
             {
-                var c = input[i];
+                if (int.TryParse(c.ToString(), out var digit))
+                {
+                    number = (number * 10) + digit;
+                    parsingNumber = true;
+                    continue;
+                }
+
+                if (parsingNumber)
+                {
+                    result.List.Add(new Packet { Value = number });
+                    parsingNumber = false;
+                    number = 0;
+                }
+
                 switch (c)
                 {
                     case '[':
@@ -31,15 +46,7 @@ public class Day13
                         result = result.Parent;
                         break;
                     default:
-                        var n = c.ToString();
-                        while (int.TryParse(input[i + 1].ToString(), out _))
-                        {
-                            i++;
-                            n += input[i];
-                        }
-
-                        result.List.Add(new Packet { Value = int.Parse(n) });
-                        break;
+                        throw new NotSupportedException();
                 }
             }
 
@@ -56,8 +63,6 @@ public class Day13
         {
             var left = Parse(lines[i]);
             var right = Parse(lines[i + 1]);
-            Console.WriteLine(left);
-            Console.WriteLine(right);
 
             var comparison = left.CompareTo(right);
             if (comparison < 0)
@@ -71,7 +76,7 @@ public class Day13
             packets.Add(right);
         }
 
-        Console.WriteLine(result);
+        Console.WriteLine($"Part 1: {result}");
 
         var divider1 = Parse("[[2]]");
         var divider2 = Parse("[[6]]");
@@ -80,7 +85,7 @@ public class Day13
 
         var ordered = packets.OrderBy(x => x).ToList();
 
-        Console.WriteLine((ordered.IndexOf(divider1) + 1) * (ordered.IndexOf(divider2) + 1));
+        Console.WriteLine($"Part 2: {(ordered.IndexOf(divider1) + 1) * (ordered.IndexOf(divider2) + 1)}");
     }
 
     private class Packet : IComparable<Packet>

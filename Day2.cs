@@ -98,26 +98,17 @@ public class Day2
                 'Z' => Result.Win,
             };
 
-            var myGuess = theirGuess switch
+            var myGuess = (theirGuess, result) switch
             {
-                Guess.Rock => result switch
-                {
-                    Result.Loss => Guess.Scissors,
-                    Result.Draw => Guess.Rock,
-                    Result.Win => Guess.Paper,
-                },
-                Guess.Paper => result switch
-                {
-                    Result.Loss => Guess.Rock,
-                    Result.Draw => Guess.Paper,
-                    Result.Win => Guess.Scissors,
-                },
-                Guess.Scissors => result switch
-                {
-                    Result.Loss => Guess.Paper,
-                    Result.Draw => Guess.Scissors,
-                    Result.Win => Guess.Rock,
-                },
+                (Guess.Rock, Result.Loss) => Guess.Scissors,
+                (Guess.Rock, Result.Draw) => Guess.Rock,
+                (Guess.Rock, Result.Win) => Guess.Paper,
+                (Guess.Paper, Result.Loss) => Guess.Rock,
+                (Guess.Paper, Result.Draw) => Guess.Paper,
+                (Guess.Paper, Result.Win) => Guess.Scissors,
+                (Guess.Scissors, Result.Loss) => Guess.Paper,
+                (Guess.Scissors, Result.Draw) => Guess.Scissors,
+                (Guess.Scissors, Result.Win) => Guess.Rock,
             };
 
             total += myGuess switch

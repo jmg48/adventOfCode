@@ -20,21 +20,21 @@ public class Day18
             .Select(s => s.Split(',').Select(int.Parse).ToList())
             .Select(c => new Cube(c[0], c[1], c[2])).ToList();
 
-        var cubeHash = new HashSet<Cube>(cubes);
+        var lava = new HashSet<Cube>(cubes);
 
         Cube Move(Cube cube, int x, int y, int z) => new(cube.X + x, cube.Y + y, cube.Z + z);
 
-        IEnumerable<Cube> Neighbours(Cube cube)
+        IEnumerable<Cube> Neighbours(Cube cube) => new[]
         {
-            yield return Move(cube, 1, 0, 0);
-            yield return Move(cube, -1, 0, 0);
-            yield return Move(cube, 0, 1, 0);
-            yield return Move(cube, 0, -1, 0);
-            yield return Move(cube, 0, 0, 1);
-            yield return Move(cube, 0, 0, -1);
-        }
+            Move(cube, 1, 0, 0),
+            Move(cube, -1, 0, 0),
+            Move(cube, 0, 1, 0),
+            Move(cube, 0, -1, 0),
+            Move(cube, 0, 0, 1),
+            Move(cube, 0, 0, -1),
+        };
 
-        Console.WriteLine($"Part 1: {cubes.Sum(cube => 6 - Neighbours(cube).Count(c => cubeHash.Contains(c)))} in {timer.ElapsedMilliseconds}ms");
+        Console.WriteLine($"Part 1: {cubes.Sum(cube => 6 - Neighbours(cube).Count(c => lava.Contains(c)))} in {timer.ElapsedMilliseconds}ms");
         timer.Restart();
 
         var xMin = cubes.Min(cube => cube.X);
@@ -57,7 +57,7 @@ public class Day18
                     for (var z = zMin - 1; z <= zMax + 1; z++)
                     {
                         var cube = new Cube(x, y, z);
-                        if (outside.Contains(cube) || cubeHash.Contains(cube))
+                        if (outside.Contains(cube) || lava.Contains(cube))
                         {
                             continue;
                         }
